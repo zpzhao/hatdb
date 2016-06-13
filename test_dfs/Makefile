@@ -18,13 +18,19 @@ include $(top_builddir)/src/Makefile.global
 
 override CPPFLAGS := -I$(libuxsql_srcdir) $(CPPFLAGS)
 
-OBJS=	test.o $(WIN32RES)
+OBJS= multiproc_test.o fmng_check.o $(WIN32RES)
 LIBS+= -lrt
-all: test
 CFLAGS += -g
-test: $(OBJS) | submake-libuxsql submake-libuxport
-	$(CC) $(CFLAGS) $(OBJS) $(libuxsql_uxport) $(LDFLAGS) $(LDFLAGS_EX) $(LIBS) -o $@$(X)
 
+all: test
+
+test: test.o $(OBJS) | submake-libuxsql submake-libuxport
+	$(CC) $(CFLAGS) test.o $(OBJS) $(libuxsql_uxport) $(LDFLAGS) $(LDFLAGS_EX) $(LIBS) -o $@$(X)
+
+fmng: fmng_info
+CFLAGS += -DFMNG_CHECK
+fmng_info: test.o $(OBJS) | submake-libuxsql submake-libuxport
+	$(CC) $(CFLAGS) test.o $(OBJS) $(libuxsql_uxport) $(LDFLAGS) $(LDFLAGS_EX) $(LIBS) -o $@$(X)
 
 clean:
 	rm *.o test
